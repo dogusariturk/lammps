@@ -26,14 +26,14 @@ def gnnp_initialize(
 
     Args:
         gnnp_type (str): type of GNNP. -> {matgl|chgnet|mace|mace-off|orb|mattersim|fairchem}
-        model_name (str): name of model for GNNP.
-        as_path (bool): if true, model_name is path of model file. this is only for chgnet/orb/fairchem.
+        model_name (str): name of the model for GNNP.
+        as_path (bool): if true, model_name is path of the model file. this is only for chgnet/orb/fairchem.
         dftd3 (bool): to add correction of DFT-D3.
         gpu (bool): using GPU, if possible.
 
     Returns:
         cutoff (float): cutoff radius.
-        with_stress (int): to calculate stress, or not.
+        with_stress (int): to calculate stress or not.
     """
     global myCalculator
     global gnnpCalculator
@@ -49,30 +49,10 @@ def gnnp_initialize(
     myAtoms = None
     myCalculator = None
     dftd3Calculator = None
-    cutoff = -1.0
 
     gnnp_type = gnnp_type.lower()
 
-    if gnnp_type == "matgl":
-        import matgl
-        from matgl.ext.ase import PESCalculator
-
-        torch.set_default_device(device)
-
-        if model_name is not None:
-            myPotential = matgl.load_model(model_name)
-        else:
-            myPotential = matgl.load_model("M3GNet-MP-2021.2.8-PES")
-
-        myCalculator = PESCalculator(
-                potential=myPotential,
-                compute_stress=True,
-                stress_unit="eV/A3"
-        )
-
-        cutoff = myPotential.model.cutoff
-
-    elif gnnp_type == "chgnet":
+    if gnnp_type == "chgnet":
         from chgnet.model import CHGNet, CHGNetCalculator
 
         if model_name is None:
@@ -90,86 +70,6 @@ def gnnp_initialize(
         ratom = float(myPotential.graph_converter.atom_graph_cutoff)
         rbond = float(myPotential.graph_converter.bond_graph_cutoff)
         cutoff = max(ratom, rbond)
-
-    elif gnnp_type == "mace":
-        from mace.calculators import mace_mp
-
-        if model_name is None:
-            model = None
-
-        elif model_name.startswith("mace-osaka24"):
-            base_path = os.path.dirname(os.path.abspath(__file__))
-            model_dir = os.path.normpath(os.path.join(base_path, "mace-osaka24"))
-            model_path = os.path.normpath(os.path.join(model_dir, model_name))
-
-            if not model_path.endswith(".model"):
-                model_path += ".model"
-
-            model = model_path
-
-        else:
-            model = model_name
-
-        myCalculator = mace_mp(
-                model=model,
-                device=device,
-                dispersion=dftd3,
-                damping="zero",
-        )
-
-        if dftd3:
-            dftd3 = False
-
-        if isinstance(myCalculator, SumCalculator):
-            cutoff = myCalculator.mixer.calcs[0].r_max
-        else:
-            cutoff = myCalculator.r_max
-
-    elif gnnp_type == "mace-off":
-        from mace.calculators import mace_off
-
-        myCalculator = mace_off(
-                model=model_name,
-                device=device
-        )
-
-        cutoff = myCalculator.r_max
-
-    elif gnnp_type == "orb":
-        from orb_models.forcefield import pretrained
-        from orb_models.forcefield.calculator import ORBCalculator
-
-        if as_path:
-            orbff = pretrained.orb_v2(
-                    weights_path=model_name,
-                    device=device
-            )
-
-        else:
-            if model_name is not None and model_name in pretrained.ORB_PRETRAINED_MODELS:
-                model_func = pretrained.ORB_PRETRAINED_MODELS[model_name]
-            else:
-                model_func = pretrained.orb_v2
-
-            if model_name is not None and "d3" in model_name:
-                if dftd3:
-                    dftd3 = False
-
-            orbff = model_func(device=device)
-
-        myCalculator = ORBCalculator(orbff, device=device)
-
-        cutoff = float(orbff.model.gnn_stacks[0]._r_max)
-
-    elif gnnp_type == "mattersim":
-        from mattersim.forcefield import MatterSimCalculator
-
-        myCalculator = MatterSimCalculator(
-                load_path=model_name,
-                device=device
-        )
-
-        cutoff = myCalculator.potential.model.model_args.get("cutoff", 5.0)
 
     elif gnnp_type == "fairchem":
         from fairchem.core import OCPCalculator
@@ -221,6 +121,114 @@ def gnnp_initialize(
 
         cutoff = myCalculator.config["model"].get("max_radius", 8.0)
 
+    elif gnnp_type == "grace":
+        from tensorpotential.calculator.foundation_models import grace_fm
+
+        myCalculator = grace_fm(
+            model=model_name or "GRACE-2L-OAM",
+        )
+
+        cutoff = myCalculator.cutoff
+
+    elif gnnp_type == "matgl":
+        import matgl
+        from matgl.ext.ase import PESCalculator
+
+        torch.set_default_device(device)
+
+        if model_name is not None:
+            myPotential = matgl.load_model(model_name)
+        else:
+            myPotential = matgl.load_model("M3GNet-MP-2021.2.8-PES")
+
+        myCalculator = PESCalculator(
+                potential=myPotential,
+                compute_stress=True,
+                stress_unit="eV/A3"
+        )
+
+        cutoff = myPotential.model.cutoff
+
+    elif gnnp_type == "mace":
+        from mace.calculators import mace_mp
+
+        if model_name is None:
+            model = None
+
+        elif model_name.startswith("mace-osaka24"):
+            base_path = os.path.dirname(os.path.abspath(__file__))
+            model_dir = os.path.normpath(os.path.join(base_path, "mace-osaka24"))
+            model_path = os.path.normpath(os.path.join(model_dir, model_name))
+
+            if not model_path.endswith(".model"):
+                model_path += ".model"
+
+            model = model_path
+
+        else:
+            model = model_name
+
+        myCalculator = mace_mp(
+                model=model,
+                device=device,
+                dispersion=dftd3,
+                damping="zero",
+        )
+
+        if dftd3:
+            dftd3 = False
+
+        if isinstance(myCalculator, SumCalculator):
+            cutoff = myCalculator.mixer.calcs[0].r_max
+        else:
+            cutoff = myCalculator.r_max
+
+    elif gnnp_type == "mace-off":
+        from mace.calculators import mace_off
+
+        myCalculator = mace_off(
+                model=model_name,
+                device=device
+        )
+
+        cutoff = myCalculator.r_max
+
+    elif gnnp_type == "mattersim":
+        from mattersim.forcefield import MatterSimCalculator
+
+        myCalculator = MatterSimCalculator(
+                load_path=model_name,
+                device=device
+        )
+
+        cutoff = myCalculator.potential.model.model_args.get("cutoff", 5.0)
+
+    elif gnnp_type == "orb":
+        from orb_models.forcefield import pretrained
+        from orb_models.forcefield.calculator import ORBCalculator
+
+        if as_path:
+            orbff = pretrained.orb_v2(
+                    weights_path=model_name,
+                    device=device
+            )
+
+        else:
+            if model_name is not None and model_name in pretrained.ORB_PRETRAINED_MODELS:
+                model_func = pretrained.ORB_PRETRAINED_MODELS[model_name]
+            else:
+                model_func = pretrained.orb_v2
+
+            if model_name is not None and "d3" in model_name:
+                if dftd3:
+                    dftd3 = False
+
+            orbff = model_func(device=device)
+
+        myCalculator = ORBCalculator(orbff, device=device)
+
+        cutoff = float(orbff.model.gnn_stacks[0]._r_max)
+
     else:
         raise ValueError("gnnp_type is incorrect: " + gnnp_type)
 
@@ -260,7 +268,7 @@ def gnnp_get_energy_forces_stress(
         atomic_numbers,
         positions,
         with_stress: bool = True
-):
+) -> tuple:
     """
     Predict total energy, atomic forces and stress w/ pre-trained GNNP.
     Args:
@@ -322,4 +330,3 @@ def gnnp_get_energy_forces_stress(
         myAtoms.calc = myCalculator
 
     return energy, forces, stress
-
