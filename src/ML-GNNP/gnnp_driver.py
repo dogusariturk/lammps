@@ -78,6 +78,13 @@ def gnnp_initialize(
         rbond = float(myPotential.graph_converter.bond_graph_cutoff)
         cutoff = max(ratom, rbond)
 
+    elif gnnp_type == 'deepmd':
+        from deepmd.calculator import DP
+
+        myCalculator = DP(model=model_name, device=device)
+
+        cutoff = myCalculator.dp.get_rcut()
+
     elif gnnp_type == "fairchem":
         from fairchem.core import OCPCalculator
 
