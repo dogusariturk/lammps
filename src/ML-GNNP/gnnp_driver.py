@@ -33,9 +33,9 @@ def gnnp_initialize(
     Initialize GNNP.
 
     Args:
-        gnnp_type (str): type of GNNP. -> {matgl|chgnet|mace|mace-off|orb|mattersim|fairchem}
+        gnnp_type (str): type of GNNP. -> {chgnet|fairchem|grace|matgl|mace|mace-off|mattersim|orb}
         model_name (str): name of the model for GNNP.
-        as_path (bool): if true, model_name is path of the model file. this is only for chgnet/orb/fairchem.
+        as_path (bool): if true, model_name is path of the model file. this is only for chgnet/fairchem.
         dftd3 (bool): to add correction of DFT-D3.
         gpu (bool): using GPU, if possible.
 
@@ -63,12 +63,11 @@ def gnnp_initialize(
     if gnnp_type == "chgnet":
         from chgnet.model import CHGNet, CHGNetCalculator
 
-        if model_name is None:
-            myPotential = CHGNet.load(use_device=device)
-        elif not as_path:
-            myPotential = CHGNet.load(use_device=device, model_name=model_name)
-        else:
-            myPotential = CHGNet.from_file(model_name)
+        myPotential = (
+            CHGNet.from_file(model_name) if as_path else
+            CHGNet.load(use_device=device, model_name=model_name) if model_name else
+            CHGNet.load(use_device=device)
+        )
 
         myCalculator = CHGNetCalculator(
                 model=myPotential,
@@ -144,15 +143,13 @@ def gnnp_initialize(
 
         torch.set_default_device(device)
 
-        if model_name is not None:
-            myPotential = matgl.load_model(model_name)
-        else:
-            myPotential = matgl.load_model("M3GNet-MP-2021.2.8-PES")
+        myPotential = (
+                matgl.load_model(model_name) if model_name else
+                matgl.load_model("M3GNet-MP-2021.2.8-PES")
+        )
 
         myCalculator = PESCalculator(
-                potential=myPotential,
-                compute_stress=True,
-                stress_unit="eV/A3"
+                potential=myPotential
         )
 
         cutoff = myPotential.model.cutoff
@@ -215,27 +212,15 @@ def gnnp_initialize(
         from orb_models.forcefield import pretrained
         from orb_models.forcefield.calculator import ORBCalculator
 
-        if as_path:
-            orbff = pretrained.orb_v2(
-                    weights_path=model_name,
-                    device=device
-            )
+        model_func = pretrained.ORB_PRETRAINED_MODELS.get(model_name, pretrained.orb_v3_conservative_20_omat)
 
-        else:
-            if model_name is not None and model_name in pretrained.ORB_PRETRAINED_MODELS:
-                model_func = pretrained.ORB_PRETRAINED_MODELS[model_name]
-            else:
-                model_func = pretrained.orb_v2
+        if model_name and "d3" in model_name and dftd3:
+            dftd3 = False
 
-            if model_name is not None and "d3" in model_name:
-                if dftd3:
-                    dftd3 = False
-
-            orbff = model_func(device=device)
-
+        orbff = model_func(device=device)
         myCalculator = ORBCalculator(orbff, device=device)
 
-        cutoff = float(orbff.model.gnn_stacks[0]._r_max)
+        cutoff = float(orbff.model.system_config.radius)
 
     else:
         raise ValueError("gnnp_type is incorrect: " + gnnp_type)
