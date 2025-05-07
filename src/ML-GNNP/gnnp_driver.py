@@ -35,7 +35,7 @@ def gnnp_initialize(
     Args:
         gnnp_type (str): type of GNNP. -> {chgnet|fairchem|grace|matgl|mace|mace-off|mattersim|orb}
         model_name (str): name of the model for GNNP.
-        as_path (bool): if true, model_name is path of the model file. this is only for chgnet/fairchem.
+        as_path (bool): if true, model_name is path of the model file. this is only for chgnet, mace, and fairchem.
         dftd3 (bool): to add correction of DFT-D3.
         gpu (bool): using GPU, if possible.
 
@@ -157,24 +157,8 @@ def gnnp_initialize(
     elif gnnp_type == "mace":
         from mace.calculators import mace_mp
 
-        if model_name is None:
-            model = None
-
-        elif model_name.startswith("mace-osaka24"):
-            base_path = os.path.dirname(os.path.abspath(__file__))
-            model_dir = os.path.normpath(os.path.join(base_path, "mace-osaka24"))
-            model_path = os.path.normpath(os.path.join(model_dir, model_name))
-
-            if not model_path.endswith(".model"):
-                model_path += ".model"
-
-            model = model_path
-
-        else:
-            model = model_name
-
         myCalculator = mace_mp(
-                model=model,
+                model=model_name,
                 device=device,
                 dispersion=dftd3,
                 damping="zero",
