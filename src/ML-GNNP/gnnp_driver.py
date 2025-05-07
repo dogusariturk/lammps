@@ -28,7 +28,7 @@ def gnnp_initialize(
     as_path: bool = False,
     dftd3: bool = False,
     gpu: bool = True,
-):
+) -> tuple[float, int]:
     """
     Initialize GNNP.
 
@@ -88,43 +88,11 @@ def gnnp_initialize(
             )
 
         else:
-            OMAT_CHECKPTS = {
-                "EquiformerV2-31M-OMat": "eqV2_31M_omat.pt",
-                "EquiformerV2-86M-OMat": "eqV2_86M_omat.pt",
-                "EquiformerV2-153M-OMat": "eqV2_153M_omat.pt",
-                "EquiformerV2-31M-MP": "eqV2_31M_mp.pt",
-                "EquiformerV2-31M-DeNS-MP": "eqV2_dens_31M_mp.pt",
-                "EquiformerV2-86M-DeNS-MP": "eqV2_dens_86M_mp.pt",
-                "EquiformerV2-153M-DeNS-MP": "eqV2_dens_153M_mp.pt",
-                "EquiformerV2-31M-OMat-Alex-MP": "eqV2_31M_omat_mp_salex.pt",
-                "EquiformerV2-86M-OMat-Alex-MP": "eqV2_86M_omat_mp_salex.pt",
-                "EquiformerV2-153M-OMat-Alex-MP": "eqV2_153M_omat_mp_salex.pt",
-            }
-
-            if model_name is not None:
-                checkpt_name = OMAT_CHECKPTS.get(model_name)
-            else:
-                checkpt_name = OMAT_CHECKPTS.get("EquiformerV2-31M-OMat")
-
-            if checkpt_name is not None:
-                base_path = os.path.dirname(os.path.abspath(__file__))
-                checkpt_dir = os.path.normpath(os.path.join(base_path, "fairchem-omat24"))
-                model_path = os.path.normpath(os.path.join(checkpt_dir, checkpt_name))
-
-                myCalculator = OCPCalculator(
-                        checkpoint_path=model_path,
-                        cpu=not gpu
-                )
-
-            else:
-                base_path = os.path.expanduser("~")
-                checkpt_dir = os.path.normpath(os.path.join(base_path, ".fairchem"))
-
-                myCalculator = OCPCalculator(
-                        model_name=model_name,
-                        local_cache=checkpt_dir,
-                        cpu=not gpu
-                )
+            myCalculator = OCPCalculator(
+                    model_name=model_name,
+                    local_cache=os.path.normpath(os.path.join(os.path.expanduser("~"), ".fairchem")),
+                    cpu=not gpu
+            )
 
         cutoff = myCalculator.config["model"].get("max_radius", 8.0)
 
