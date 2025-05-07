@@ -9,7 +9,15 @@ from ase import Atoms
 from ase.calculators.mixing import SumCalculator
 
 import os
-import torch
+try:
+    import torch
+    CUDA_AVAILABLE = torch.cuda.is_available()
+except ImportError:
+    try:
+        import tensorflow as tf
+        CUDA_AVAILABLE = tf.config.list_physical_devices("GPU")
+    except ImportError as e:
+        raise ImportError("Neither `torch` nor `tensorflow` is available. Please install one of them.") from e
 
 _USING_TORCH_DFTD3 = True
 
@@ -43,7 +51,7 @@ def gnnp_initialize(
     if gnnp_type is None:
         raise ValueError("gnnp_type is not defined.")
 
-    gpu = gpu and torch.cuda.is_available()
+    gpu = gpu and CUDA_AVAILABLE
     device = "cuda" if gpu else "cpu"
 
     myAtoms = None
