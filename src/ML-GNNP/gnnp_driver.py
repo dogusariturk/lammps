@@ -105,6 +105,16 @@ def gnnp_initialize(
 
         cutoff = myCalculator.cutoff
 
+    elif gnnp_type == "hienet":
+        from hienet.hienet_calculator import HIENetCalculator
+
+        myCalculator = HIENetCalculator(
+                model=model_name,
+                device=device
+        )
+
+        cutoff = myCalculator.model.cutoff
+
     elif gnnp_type == "matgl":
         import matgl
         from matgl.ext.ase import PESCalculator
