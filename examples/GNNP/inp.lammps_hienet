@@ -1,0 +1,32 @@
+# This is an example of the driver of `HIENet' <https://github.com/divelab/AIRS/tree/main/OpenMat/HIENet>.
+# This driver is developed by AdvanceSoft Corp <https://www.advancesoft.jp>.
+# and modified by Doguhan Sariturk <dogu.sariturk@gmail.com>.
+
+# NOTE:
+#   1) the units must be metal
+#   2) the 3D periodic boundary condition must be used
+#   3) cannot use MPI parallelization, only OpenMP or GPU
+
+units         metal
+boundary      p p p
+atom_style    atomic
+
+pair_style    gnnp ../../src/ML-GNNP
+#pair_style    gnnp/d3 ../../src/ML-GNNP
+#pair_style    gnnp/gpu ../../src/ML-GNNP
+#pair_style    gnnp/d3/gpu ../../src/ML-GNNP
+
+read_data     ./dat.lammps
+
+pair_coeff    * *  hienet lmax3_01-24-2025.ckpt Zr O  # Change the path to your model file
+
+dump          myDump all custom 10 xyz.lammpstrj id element x y z
+dump_modify   myDump sort id element Zr O
+
+thermo_style  custom step time cpu pe ke etotal temp press vol density
+thermo        10
+
+velocity      all create 300.0 12345
+fix           myEnse all npt temp 300.0 300.0 0.1 aniso 1.0 1.0 1.0
+timestep      5.0e-4
+run           10000
