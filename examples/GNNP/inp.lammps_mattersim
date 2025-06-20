@@ -21,8 +21,8 @@ pair_style    gnnp ../../src/ML-GNNP
 
 read_data     ./dat.lammps
 
-pair_coeff    * * mattersim MatterSim-v1.0.0-1M  Zr O
-#pair_coeff    * * mattersim MatterSim-v1.0.0-5M  Zr O
+pair_coeff    * * MatterSim MatterSim-v1.0.0-1M  Zr O
+#pair_coeff    * * MatterSim MatterSim-v1.0.0-5M  Zr O
 
 dump          myDump all custom 10 xyz.lammpstrj id element x y z
 dump_modify   myDump sort id element Zr O

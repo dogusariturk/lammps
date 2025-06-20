@@ -22,16 +22,7 @@ pair_style    gnnp ../../src/ML-GNNP
 
 read_data     ./dat.lammps
 
-pair_coeff    * *  fairchem EquiformerV2-31M-OMat  Zr O
-#pair_coeff    * *  fairchem EquiformerV2-86M-OMat  Zr O
-#pair_coeff    * *  fairchem EquiformerV2-153M-OMat  Zr O
-#pair_coeff    * *  fairchem EquiformerV2-31M-OMat-Alex-MP  Zr O
-#pair_coeff    * *  fairchem EquiformerV2-86M-OMat-Alex-MP  Zr O
-#pair_coeff    * *  fairchem EquiformerV2-153M-OMat-Alex-MP  Zr O
-#pair_coeff    * *  fairchem EquiformerV2-83M-S2EF-OC20-2M  Zr O
-#pair_coeff    * *  fairchem EquiformerV2-lE4-lF100-S2EFS-OC22  Zr O
-#pair_coeff    * *  fairchem EquiformerV2-S2EF-ODAC  Zr O
-#pair_coeff    * *  fairchem path ./users_model.pt  Zr O
+pair_coeff    * *  EqV2 EquiformerV2-31M-OMat  Zr O
 
 dump          myDump all custom 10 xyz.lammpstrj id element x y z
 dump_modify   myDump sort id element Zr O

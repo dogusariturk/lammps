@@ -60,7 +60,7 @@ def gnnp_initialize(
 
     gnnp_type = gnnp_type.lower()
 
-    if gnnp_type == "chgnet":
+    if gnnp_type == "CHGNet":
         from chgnet.model import CHGNet, CHGNetCalculator
 
         myPotential = (
@@ -78,14 +78,14 @@ def gnnp_initialize(
         rbond = float(myPotential.graph_converter.bond_graph_cutoff)
         cutoff = max(ratom, rbond)
 
-    elif gnnp_type == 'deepmd':
+    elif gnnp_type == 'DeePMD':
         from deepmd.calculator import DP
 
         myCalculator = DP(model=model_name, device=device)
 
         cutoff = myCalculator.dp.get_rcut()
 
-    elif gnnp_type == "fairchem":
+    elif gnnp_type == "EqV2" or gnnp_type == "eSEN":
         from fairchem.core import OCPCalculator
 
         if as_path:
@@ -103,7 +103,7 @@ def gnnp_initialize(
 
         cutoff = myCalculator.config["model"].get("max_radius", 8.0)
 
-    elif gnnp_type == "grace":
+    elif gnnp_type == "Grace":
         from tensorpotential.calculator.foundation_models import grace_fm
 
         myCalculator = grace_fm(
@@ -112,7 +112,7 @@ def gnnp_initialize(
 
         cutoff = myCalculator.cutoff
 
-    elif gnnp_type == "hienet":
+    elif gnnp_type == "HIENet":
         from hienet.hienet_calculator import HIENetCalculator
 
         myCalculator = HIENetCalculator(
@@ -122,7 +122,7 @@ def gnnp_initialize(
 
         cutoff = myCalculator.model.cutoff
 
-    elif gnnp_type == "matgl":
+    elif gnnp_type == "M3GNet":
         import matgl
         from matgl.ext.ase import PESCalculator
 
@@ -139,7 +139,7 @@ def gnnp_initialize(
 
         cutoff = myPotential.model.cutoff
 
-    elif gnnp_type == "mace":
+    elif gnnp_type == "MACE":
         from mace.calculators import mace_mp
 
         myCalculator = mace_mp(
@@ -167,7 +167,7 @@ def gnnp_initialize(
 
         cutoff = myCalculator.r_max
 
-    elif gnnp_type == "mattersim":
+    elif gnnp_type == "MatterSim":
         from mattersim.forcefield import MatterSimCalculator
 
         myCalculator = MatterSimCalculator(
@@ -177,7 +177,7 @@ def gnnp_initialize(
 
         cutoff = myCalculator.potential.model.model_args.get("cutoff", 5.0)
 
-    elif gnnp_type == "orb":
+    elif gnnp_type == "ORB":
         from orb_models.forcefield import pretrained
         from orb_models.forcefield.calculator import ORBCalculator
 

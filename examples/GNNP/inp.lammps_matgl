@@ -21,8 +21,8 @@ pair_style    gnnp ../../src/ML-GNNP
 
 read_data     ./dat.lammps
 
-pair_coeff    * *  matgl M3GNet-MP-2021.2.8-PES  Zr O
-#pair_coeff    * *  matgl M3GNet-MP-2021.2.8-DIRECT-PES  Zr O
+pair_coeff    * *  M3GNet M3GNet-MP-2021.2.8-PES  Zr O
+#pair_coeff    * *  M3GNet M3GNet-MP-2021.2.8-DIRECT-PES  Zr O
 
 dump          myDump all custom 10 xyz.lammpstrj id element x y z
 dump_modify   myDump sort id element Zr O

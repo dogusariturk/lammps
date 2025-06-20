@@ -21,8 +21,8 @@ pair_style    gnnp ../../src/ML-GNNP
 
 read_data     ./dat.lammps
 
-pair_coeff    * *  chgnet 0.3.0  Zr O
-#pair_coeff    * *  chgnet path ./users_model.pt  Zr O
+pair_coeff    * *  CHGNet 0.3.0  Zr O
+#pair_coeff    * *  CHGNet path ./users_model.pt  Zr O
 
 dump          myDump all custom 10 xyz.lammpstrj id element x y z
 dump_modify   myDump sort id element Zr O

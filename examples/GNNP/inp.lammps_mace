@@ -21,13 +21,13 @@ pair_style    gnnp ../../src/ML-GNNP
 
 read_data     ./dat.lammps
 
-pair_coeff    * *  mace medium  Zr O
-#pair_coeff    * *  mace small  Zr O
-#pair_coeff    * *  mace large  Zr O
-#pair_coeff    * *  mace medium-mpa-0  Zr O
-#pair_coeff    * *  mace mace-osaka24-small   Zr O
-#pair_coeff    * *  mace mace-osaka24-medium  Zr O
-#pair_coeff    * *  mace mace-osaka24-large   Zr O
+pair_coeff    * *  MACE medium  Zr O
+#pair_coeff    * *  MACE small  Zr O
+#pair_coeff    * *  MACE large  Zr O
+#pair_coeff    * *  MACE medium-mpa-0  Zr O
+#pair_coeff    * *  MACE mace-osaka24-small   Zr O
+#pair_coeff    * *  MACE mace-osaka24-medium  Zr O
+#pair_coeff    * *  MACE mace-osaka24-large   Zr O
 
 dump          myDump all custom 10 xyz.lammpstrj id element x y z
 dump_modify   myDump sort id element Zr O

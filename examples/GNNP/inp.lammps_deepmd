@@ -19,7 +19,7 @@ pair_style    gnnp ../../src/ML-GNNP
 
 read_data     ./dat.lammps
 
-pair_coeff    * *  deepmd 2025-03-14-dpa3-openlam.pth Zr O  # Change the path to your model file
+pair_coeff    * *  DeePMD 2025-03-14-dpa3-openlam.pth Zr O  # Change the path to your model file
 
 dump          myDump all custom 10 xyz.lammpstrj id element x y z
 dump_modify   myDump sort id element Zr O

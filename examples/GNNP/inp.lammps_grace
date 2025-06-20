@@ -20,12 +20,12 @@ pair_style    gnnp ../../src/ML-GNNP
 
 read_data     ./dat.lammps
 
-pair_coeff    * *  grace GRACE-2L-OMAT Zr O
-#pair_coeff    * *  grace GRACE-1L-OMAT Zr O
-#pair_coeff    * *  grace GRACE-2L-OAM Zr O
-#pair_coeff    * *  grace GRACE-1L-OAM Zr O
-#pair_coeff    * *  grace GRACE-2L-MP-r6 Zr O
-#pair_coeff    * *  grace GRACE-2L-MP-r5 Zr O
+pair_coeff    * *  Grace GRACE-2L-OMAT Zr O
+#pair_coeff    * *  Grace GRACE-1L-OMAT Zr O
+#pair_coeff    * *  Grace GRACE-2L-OAM Zr O
+#pair_coeff    * *  Grace GRACE-1L-OAM Zr O
+#pair_coeff    * *  Grace GRACE-2L-MP-r6 Zr O
+#pair_coeff    * *  Grace GRACE-2L-MP-r5 Zr O
 
 dump          myDump all custom 10 xyz.lammpstrj id element x y z
 dump_modify   myDump sort id element Zr O
